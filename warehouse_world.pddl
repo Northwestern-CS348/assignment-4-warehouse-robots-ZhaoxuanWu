@@ -31,4 +31,28 @@
       :effect (and (started ?s) (packing-at ?s ?l) (not (unstarted ?s)) (not (available ?l)))
    )
 
+   (:action robotMove
+      :parameters (?l1 - location ?l2 - location ?r - robot)
+      :precondition (and (no-robot ?l2) (at ?r ?l1) (connected ?l1 ?l2))
+      :effect (and (at ?r ?l2) (not (at ?r ?l1)) (no-robot ?l1) (not (no-robot ?l2)))
+   )
+
+   (:action robotMoveWithPallette
+      :parameters (?l1 - location ?l2 - location ?r - robot ?p - pallette)
+      :precondition (and (no-robot ?l2) (no-pallette ?l2) (at ?r ?l1) (at ?p ?l1) (connected ?l1 ?l2))
+      :effect (and (at ?r ?l2) (at ?p ?l2) (not (at ?r ?l1)) (not (at ?p ?l1)) (no-robot ?l1) (no-pallette ?l1) (not (no-robot ?l2)) (not (no-pallette ?l2)))
+   )
+
+   (:action moveItemFromPalletteToShipment
+      :parameters (?l - location ?s - shipment ?si - saleitem ?p - pallette ?o - order)
+      :precondition (and (packing-at ?s ?l) (ships ?s ?o) (orders ?o ?si) (at ?p ?l) (contains ?p ?si))
+      :effect (and (not (contains ?p ?si)) (includes ?s ?si))
+   )
+
+   (:action completeShipment
+      :parameters (?s - shipment ?o - order ?l - location)
+      :precondition (and (packing-at ?s ?l) (started ?s) (ships ?s ?o) (forall (?si - saleitem) (imply (orders ?o ?si) (includes ?s ?si))))
+      :effect (and (not (started ?s)) (complete ?s) (available ?l))
+   )
+
 )
